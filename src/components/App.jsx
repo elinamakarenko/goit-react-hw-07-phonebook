@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from './Form/Form';
 import Contacts from './Contacts';
@@ -7,12 +8,16 @@ import {
   addContacts,
   deleteContacts,
 } from '../redux/contacts-actions';
+import { fetchContacts } from 'redux/contacts-operations';
+import { getContacts, getFilter } from 'redux/contacts-selectors';
 
 export default function App() {
-  const contacts = useSelector(store => store.contacts.contactsReducer);
-  const filter = useSelector(store => store.contacts.filter);
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
   const dispatch = useDispatch();
-
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
   const formSubmit = payload => {
     const { name } = payload;
     if (contacts.find(contact => contact.name === name)) {
@@ -44,7 +49,9 @@ export default function App() {
       <Form onSubmit={formSubmit} />
       <h2>Contacts</h2>
       <Filter value={filter} onChange={changeFilter} />
-      <Contacts contacts={findContacts()} onClick={onClick} />
+      {contacts.length > 0 && (
+        <Contacts contacts={findContacts()} onClick={onClick} />
+      )}
     </>
   );
 }
