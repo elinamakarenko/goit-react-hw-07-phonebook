@@ -1,16 +1,28 @@
-import { fetchContactsAll } from 'services/contacts-api';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import {
-  fetchContactsRequest,
-  fetchContactsSuccess,
-  fetchContactsError,
-} from './contacts-actions';
+  fetchContactsAll,
+  addContacts,
+  deleteContacts,
+} from 'services/contacts-api';
 
-export const fetchContacts = () => async dispatch => {
-  dispatch(fetchContactsRequest());
-  try {
+export const fetchContacts = createAsyncThunk(
+  'contacts/fetchContacts',
+  async () => {
     const contacts = await fetchContactsAll();
-    dispatch(fetchContactsSuccess(contacts));
-  } catch (error) {
-    dispatch(fetchContactsError(error));
+    return contacts;
   }
-};
+);
+export const addContact = createAsyncThunk(
+  'contacts/addContact',
+  async data => {
+    const contacts = await addContacts(data);
+    return contacts;
+  }
+);
+export const deleteContact = createAsyncThunk(
+  'contacts/deleteContact',
+  async id => {
+    await deleteContacts(id);
+    return id;
+  }
+);

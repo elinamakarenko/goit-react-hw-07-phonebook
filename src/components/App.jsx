@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Form from './Form/Form';
 import Contacts from './Contacts';
 import Filter from './Filter';
+import { filterContacts } from '../redux/contacts-actions';
 import {
-  filterContacts,
-  addContacts,
-  deleteContacts,
-} from '../redux/contacts-actions';
-import { fetchContacts } from 'redux/contacts-operations';
+  fetchContacts,
+  addContact,
+  deleteContact,
+} from 'redux/contacts-operations';
 import { getContacts, getFilter } from 'redux/contacts-selectors';
 
 export default function App() {
@@ -24,7 +24,7 @@ export default function App() {
       alert(`${name} is already in contacts!`);
       return contacts;
     } else {
-      return dispatch(addContacts(payload));
+      return dispatch(addContact(payload));
     }
   };
 
@@ -40,7 +40,7 @@ export default function App() {
   };
 
   const onClick = contactId => {
-    dispatch(deleteContacts(contactId));
+    dispatch(deleteContact(contactId));
   };
 
   return (

@@ -1,35 +1,59 @@
-import { combineReducers } from 'redux';
-import { createReducer } from '@reduxjs/toolkit';
+import { createReducer, createSlice } from '@reduxjs/toolkit';
+import { filterContacts } from './contacts-actions';
 import {
-  filterContacts,
-  addContacts,
-  deleteContacts,
-  fetchContactsRequest,
-  fetchContactsSuccess,
-  fetchContactsError,
-} from './contacts-actions';
+  fetchContacts,
+  addContact,
+  deleteContact,
+} from './contacts-operations';
 
 export const filter = createReducer('', {
   [filterContacts]: (_, { payload }) => payload,
 });
-const items = createReducer([], {
-  [fetchContactsSuccess]: (_, { payload }) => payload,
-  [addContacts]: (state, { payload }) => [...state, payload],
-  [deleteContacts]: (state, { payload }) =>
-    state.filter(({ id }) => id !== payload),
-});
-const isLoading = createReducer(false, {
-  [fetchContactsRequest]: () => true,
-  [fetchContactsSuccess]: () => false,
-  [fetchContactsError]: () => false,
+
+const contactsSlice = createSlice({
+  name: 'contacts',
+  initialState: { items: [], isLoading: false, error: null },
+  extraReducers: {
+    [fetchContacts.pending]: state => {
+      state.isLoading = true;
+      state.error = null;
+    },
+    [fetchContacts.fulfilled]: (state, { payload }) => {
+      state.items = payload;
+      state.isLoading = false;
+      state.error = null;
+    },
+    [fetchContacts.rejected]: (state, { payload }) => {
+      state.error = payload;
+      state.isLoading = false;
+    },
+    [addContact.pending]: (state, { payload }) => {
+      state.isLoading = true;
+      state.error = null;
+    },
+    [addContact.fulfilled]: (state, { payload }) => {
+      state.items.push(payload);
+      state.isLoading = false;
+      state.error = null;
+    },
+    [addContact.error]: (state, { payload }) => {
+      state.isLoading = false;
+      state.error = payload;
+    },
+    [deleteContact.pending]: (state, { payload }) => {
+      state.isLoading = true;
+      state.error = null;
+    },
+    [deleteContact.fulfilled]: (state, { payload }) => {
+      state.items = state.items.filter(({ id }) => id !== payload);
+      state.isLoading = false;
+      state.error = null;
+    },
+    [deleteContact.error]: (state, { payload }) => {
+      state.isLoading = false;
+      state.error = payload;
+    },
+  },
 });
 
-const error = createReducer(null, {
-  [fetchContactsError]: (_, { payload }) => payload,
-  [fetchContactsSuccess]: () => null,
-});
-export default combineReducers({
-  items,
-  isLoading,
-  error,
-});
+export default contactsSlice.reducer;
